@@ -1,0 +1,129 @@
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: loyalty_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+      - ./backend/storage:/var/www/storage
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=bumpa_loyalty
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+      - QUEUE_CONNECTION=rabbitmq
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    networks:
+      - loyalty_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: loyalty_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - loyalty_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: loyalty_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: bumpa_loyalty
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - loyalty_network
+
+  redis:
+    image: redis:alpine
+    container_name: loyalty_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - loyalty_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: loyalty_rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - loyalty_network
+
+  queue_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: loyalty_queue_worker
+    restart: unless-stopped
+    working_dir: /var/www
+    entrypoint: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
+    volumes:
+      - ./backend:/var/www
+    environment:
+      - DB_HOST=mysql
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - QUEUE_CONNECTION=rabbitmq
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    networks:
+      - loyalty_network
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: loyalty_frontend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:80"
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:8000/api
+  #   depends_on:
+  #     - nginx
+  #   networks:
+  #     - loyalty_network
+
+networks:
+  loyalty_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
