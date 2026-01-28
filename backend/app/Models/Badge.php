@@ -88,16 +88,16 @@ class Badge extends Model
             'points' => [
                 'current' => $totalPoints,
                 'required' => $this->points_required,
-                'percentage' => min(100, ($totalPoints / $this->points_required) * 100),
+                'percentage' => min(100, $this->points_required ?($totalPoints / $this->points_required):0 * 100),
             ],
             'achievements' => [
                 'current' => $achievementCount,
                 'required' => $this->achievements_required,
-                'percentage' => min(100, ($achievementCount / $this->achievements_required) * 100),
+                'percentage' => min(100, $this->achievements_required ?($achievementCount / $this->achievements_required):0 * 100),
             ],
             'overall_percentage' => min(100, (
-                (($totalPoints / $this->points_required) * 50) +
-                (($achievementCount / $this->achievements_required) * 50)
+                ($this->points_required?($totalPoints / $this->points_required):0 * 50) +
+                ($this->achievements_required?($achievementCount / $this->achievements_required):0 * 50)
             )),
             'earned' => $this->isEarnedBy($user),
         ];

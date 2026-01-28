@@ -4,16 +4,12 @@ namespace App\Contracts;
 
 use App\Models\User;
 
-/**
- * PaymentProviderInterface
- *
- * Contract for payment provider implementations
- */
-interface PaymentProviderInterface
-{
-    public function getName(): string;
-    public function transferCashback(User $user, float $amount, string $currency, array $metadata): array;
-}
+
+namespace App\Services\Payment\Providers;
+
+use App\Contracts\PaymentProviderInterface;
+use App\Models\User;
+
 
 class MockPaymentProvider implements PaymentProviderInterface
 {

@@ -18,11 +18,6 @@ use Illuminate\Support\Facades\DB;
 class AdminAchievementController extends Controller
 {
    
-    public function __construct()
-    {
-        $this->middleware('admin');
-    }
-
     /**
      * Get all users' achievements and badge progress
      *
