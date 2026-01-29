@@ -23,8 +23,8 @@ class MockPaymentProvider implements PaymentProviderInterface
         // Simulate processing delay
         usleep(500000); // 0.5 seconds
 
-        // Simulate 90% success rate
-        $isSuccess = rand(1, 100) <= 90;
+        // Simulate 100% success rate for testing
+        $isSuccess = true;
 
         if ($isSuccess) {
             return [

@@ -41,9 +41,6 @@ class AchievementService
                 }
             ]);
 
-            // Calculate user stats once
-            $userStats = $this->getUserStats($user);
-
             // Get all active achievements that user hasn't unlocked yet
             $achievements = Achievement::active()
                 ->whereDoesntHave('users', function ($query) use ($user) {
@@ -52,7 +49,7 @@ class AchievementService
                 ->get();
 
             foreach ($achievements as $achievement) {
-                if ($this->checkAndUpdateProgress($user, $achievement, $purchase, $userStats)) {
+                if ($this->checkAndUpdateProgress($user, $achievement, $purchase)) {
                     $unlockedAchievements[] = $achievement;
                 }
             }

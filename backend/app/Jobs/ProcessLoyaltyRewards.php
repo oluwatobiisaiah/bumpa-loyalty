@@ -40,11 +40,18 @@ class ProcessLoyaltyRewards implements ShouldQueue
         BadgeService $badgeService,
         CashbackPaymentService $cashbackService
     ): void {
+        Log::info('Starting ProcessLoyaltyRewards job', [
+            'purchase_id' => $this->purchase->id,
+            'job_id' => $this->job ? $this->job->getJobId() : null,
+        ]);
+
         try {
-            Log::info('Processing loyalty rewards', [
+            Log::info('Processing loyalty rewards - initial checks', [
                 'purchase_id' => $this->purchase->id,
                 'user_id' => $this->purchase->user_id,
                 'amount' => $this->purchase->amount,
+                'status' => $this->purchase->status,
+                'processed_for_loyalty' => $this->purchase->processed_for_loyalty,
             ]);
 
             // Skip if already processed
@@ -64,9 +71,28 @@ class ProcessLoyaltyRewards implements ShouldQueue
                 return;
             }
 
+            Log::info('Loading user relationship', [
+                'purchase_id' => $this->purchase->id,
+            ]);
             $user = $this->purchase->user;
 
+            if (!$user) {
+                Log::error('User not found for purchase', [
+                    'purchase_id' => $this->purchase->id,
+                    'user_id' => $this->purchase->user_id,
+                ]);
+                throw new \Exception('User not found for purchase');
+            }
+
+            Log::info('User loaded successfully', [
+                'purchase_id' => $this->purchase->id,
+                'user_id' => $user->id,
+            ]);
+
             // Step 1: Process achievements
+            Log::info('Starting achievement processing', [
+                'purchase_id' => $this->purchase->id,
+            ]);
             $unlockedAchievements = $achievementService->processPurchaseForAchievements($this->purchase);
 
             Log::info('Achievements processed', [
@@ -75,6 +101,10 @@ class ProcessLoyaltyRewards implements ShouldQueue
             ]);
 
             // Step 2: Check and award badges
+            Log::info('Starting badge processing', [
+                'purchase_id' => $this->purchase->id,
+                'user_id' => $user->id,
+            ]);
             $newBadges = $badgeService->checkAndAwardBadges($user);
 
             Log::info('Badges processed', [
@@ -83,6 +113,9 @@ class ProcessLoyaltyRewards implements ShouldQueue
             ]);
 
             // Step 3: Process cashback payment
+            Log::info('Starting cashback processing', [
+                'purchase_id' => $this->purchase->id,
+            ]);
             $cashbackTransaction = $cashbackService->processCashback($this->purchase);
 
             Log::info('Cashback processed', [
@@ -93,6 +126,9 @@ class ProcessLoyaltyRewards implements ShouldQueue
             ]);
 
             // Mark purchase as processed
+            Log::info('Marking purchase as processed', [
+                'purchase_id' => $this->purchase->id,
+            ]);
             $this->purchase->markAsProcessed();
 
             Log::info('Loyalty rewards processing completed', [
@@ -101,10 +137,12 @@ class ProcessLoyaltyRewards implements ShouldQueue
                 'badges_earned' => count($newBadges),
                 'cashback_amount' => $cashbackTransaction->amount,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Failed to process loyalty rewards', [
                 'purchase_id' => $this->purchase->id,
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
 

@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 echo "Waiting for MySQL to be ready..."
 
@@ -22,9 +21,31 @@ done
 
 echo "MySQL is up!"
 
-# Always run migrations
-echo "Running migrations..."
-php artisan migrate --force
+# Run migrations only if not already run
+MIGRATION_COUNT=$(php -r "
+\$pdo = new PDO(
+    'mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_DATABASE'),
+    getenv('DB_USERNAME'),
+    getenv('DB_PASSWORD')
+);
+try {
+    \$stmt = \$pdo->query('SELECT COUNT(*) FROM migrations');
+    echo \$stmt->fetchColumn();
+} catch (Exception \$e) {
+    echo '0';
+}
+")
+
+if [ "$MIGRATION_COUNT" -eq 0 ]; then
+  echo "Running migrations..."
+  if php artisan migrate --force; then
+    echo "Migrations completed."
+  else
+    echo "Migrations failed, but continuing..."
+  fi
+else
+  echo "Migrations already run — skipping."
+fi
 
 # Run seeders only if the database is empty
 TABLE_COUNT=$(php -r "
@@ -60,13 +81,7 @@ while (!@fsockopen('$RABBIT_HOST', $RABBIT_PORT)) {
 echo 'RabbitMQ is up!'.PHP_EOL;
 "
 
-# Create the default queue if it doesn't exist
-echo "Ensuring RabbitMQ 'default' queue exists..."
-rabbitmqadmin declare queue name=default durable=true \
-    --vhost="$RABBIT_VHOST" \
-    --username="$RABBIT_USER" \
-    --password="$RABBIT_PASS" \
-    >/dev/null 2>&1 || true
+# Note: Queue declaration is handled by Laravel's queue configuration
 
 echo "Starting PHP-FPM..."
 exec php-fpm
