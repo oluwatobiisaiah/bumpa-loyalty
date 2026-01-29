@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 
+use Illuminate\Support\Facades\Cache;
+
 /**
  * AchievementService
  *
@@ -29,6 +31,19 @@ class AchievementService
         try {
             DB::beginTransaction();
 
+            // Preload user data to avoid N+1 queries
+            $user->load([
+                'purchases' => function ($query) {
+                    $query->completed()->select('id', 'user_id', 'amount');
+                },
+                'achievements' => function ($query) {
+                    $query->select('achievements.id', 'type', 'criteria');
+                }
+            ]);
+
+            // Calculate user stats once
+            $userStats = $this->getUserStats($user);
+
             // Get all active achievements that user hasn't unlocked yet
             $achievements = Achievement::active()
                 ->whereDoesntHave('users', function ($query) use ($user) {
@@ -37,7 +52,7 @@ class AchievementService
                 ->get();
 
             foreach ($achievements as $achievement) {
-                if ($this->checkAndUpdateProgress($user, $achievement, $purchase)) {
+                if ($this->checkAndUpdateProgress($user, $achievement, $purchase, $userStats)) {
                     $unlockedAchievements[] = $achievement;
                 }
             }
@@ -205,3 +220,4 @@ class AchievementService
             ->get();
     }
 }
+

@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
  * AuthController
@@ -39,7 +40,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'message' => 'Login successful',
@@ -80,7 +81,7 @@ class AuthController extends Controller
             'total_cashback' => 0,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'message' => 'Registration successful',
@@ -105,10 +106,27 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        JWTAuth::invalidate(JWTAuth::getToken());
 
         return response()->json([
             'message' => 'Logout successful',
+        ]);
+    }
+
+    /**
+     * Refresh JWT token
+     *
+     * @group Authentication
+     * @authenticated
+     * POST /api/v1/refresh
+     */
+    public function refresh(Request $request): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'token' => JWTAuth::refresh(),
+                'token_type' => 'bearer',
+            ],
         ]);
     }
 

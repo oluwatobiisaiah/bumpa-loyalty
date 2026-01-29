@@ -28,9 +28,10 @@ Route::prefix('v1')->group(function () {
 /**
  * Protected customer routes
  */
-Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
+Route::prefix('v1')->middleware(['auth:jwt'])->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user', [AuthController::class, 'user']);
 
     // Loyalty dashboard
