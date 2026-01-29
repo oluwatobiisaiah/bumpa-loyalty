@@ -25,7 +25,6 @@ class ProcessPurchaseForLoyalty
         ]);
 
         // Dispatch to queue for async processing
-        ProcessLoyaltyRewards::dispatch($event->purchase)
-            ->onQueue('loyalty');
+        ProcessLoyaltyRewards::dispatch($event->purchase);
     }
 }

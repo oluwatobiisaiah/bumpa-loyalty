@@ -27,9 +27,14 @@ export const PurchasesPage: React.FC = () => {
   const { mutate: createPurchase, isPending } = useCreatePurchase();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    amount: '',
     items: [{ name: '', quantity: 1, price: '' }],
   });
+
+  const total = formData.items.reduce((sum, item) => {
+    const price = parseFloat(item.price || '0');
+    const qty = item.quantity || 0;
+    return sum + qty * price;
+  }, 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,16 +45,17 @@ export const PurchasesPage: React.FC = () => {
       price: parseFloat(item.price!),
     }));
 
+    const amount = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
+
     createPurchase(
       {
-        amount: parseFloat(formData.amount),
+        amount,
         items,
       },
       {
         onSuccess: () => {
           setDialogOpen(false);
           setFormData({
-            amount: '',
             items: [{ name: '', quantity: 1, price: '' }],
           });
         },
@@ -106,16 +112,6 @@ export const PurchasesPage: React.FC = () => {
               <DialogTitle>Create Purchase</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Total Amount (₦)</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  required
-                />
-              </div>
 
               <div className="space-y-3">
                 <Label>Items</Label>
@@ -147,6 +143,9 @@ export const PurchasesPage: React.FC = () => {
                 <Button type="button" variant="outline" size="sm" onClick={addItem}>
                   Add Item
                 </Button>
+                <div className="flex justify-end">
+                  <p className="text-sm font-medium">Total: {formatCurrency(total)}</p>
+                </div>
               </div>
 
               <div className="flex gap-2">
