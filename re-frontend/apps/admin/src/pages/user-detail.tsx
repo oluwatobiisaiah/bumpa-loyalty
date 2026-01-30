@@ -27,7 +27,6 @@ import {
   Trophy,
   Award,
   Wallet,
-  ShoppingCart,
   Calendar,
   Mail,
   User,

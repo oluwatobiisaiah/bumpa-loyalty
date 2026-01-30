@@ -1,10 +1,7 @@
 import React from 'react';
 import { cn } from '../lib/utils';
-import type { AchievementProgress } from '@loyalty/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Progress } from './ui/progress';
-import { Badge } from './ui/badge';
-import { CheckCircle2, Lock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+
 
 interface StatsCardProps {
   title: string;

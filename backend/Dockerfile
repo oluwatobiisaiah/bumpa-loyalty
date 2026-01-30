@@ -47,6 +47,7 @@ COPY . .
 RUN chown -R loyalty:loyalty /var/www
 
 COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

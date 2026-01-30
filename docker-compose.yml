@@ -108,20 +108,20 @@ services:
     networks:
       - loyalty_network
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: loyalty_frontend
-  #   restart: unless-stopped
-  #   ports:
-  #     - "3000:80"
-  #   environment:
-  #     - REACT_APP_API_URL=http://localhost:8000/api
-  #   depends_on:
-  #     - nginx
-  #   networks:
-  #     - loyalty_network
+  frontend:
+    build:
+      context: ./re-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000/api
+    container_name: loyalty_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - nginx
+    networks:
+      - loyalty_network
 
 networks:
   loyalty_network:
