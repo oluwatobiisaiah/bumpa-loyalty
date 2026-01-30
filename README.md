@@ -10,6 +10,61 @@ This application provides a complete loyalty system with:
 - **Backend API**: Event-driven Laravel microservice handling business logic
 - **Infrastructure**: Docker-based deployment with MySQL, Redis, and RabbitMQ
 
+
+## Setup and Running the App
+
+### Prerequisites
+- Docker (version 20.10 or later)
+- Docker Compose (version 2.0 or later)
+
+### Environment Setup
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd bumpa-loyalty-app
+   ```
+
+2. Copy the environment file for the backend:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+
+3. Configure the environment variables in `backend/.env` as needed (database credentials, API keys, etc.).
+
+### Running the Application
+1. Start all services using Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+
+   This will start the following services:
+   - **Laravel Backend**: Available at `http://localhost:8000`
+   - **React Frontend (Customer Portal)**: Available at `http://localhost:3000`
+   - **MySQL Database**: Available at `localhost:3307`
+   - **Redis**: Available at `localhost:6380`
+   - **RabbitMQ Management**: Available at `http://localhost:15672` (username: guest, password: guest)
+
+2. Create a queue in the RabbitMQ called `default`, because Laravel doesn't create that automatically which is meant not to be so:
+   - Go to [RabbitMQ Management](http://localhost:15672)
+   - Click `Queue` and create a queue named `default`
+
+
+3. Access the applications:
+   - Customer Portal: `http://localhost:3000`
+   - Admin Portal: `http://localhost:3000/admin` (or as configured)
+   - Backend API: `http://localhost:8000/api`
+
+### Stopping the Application
+To stop all services:
+```bash
+docker-compose down
+```
+
+To stop and remove volumes (this will delete database data):
+```bash
+docker-compose down -v
+```
+
 ## Architecture
 
 ### Backend (Laravel)
@@ -231,7 +286,7 @@ processed_at, created_at, updated_at
 ## Security Architecture
 
 ### Authentication
-- **Token-Based**: Laravel Sanctum SPA authentication
+- **Token-Based**: Laravel Sanctum SPA authentication and JWT
 - **Token Storage**: Encrypted in database
 - **Token Expiration**: Configurable TTL
 - **Revocation**: Instant token invalidation
@@ -294,51 +349,6 @@ $user->update($data);
 Cache::put("user:{$user->id}", $user, 3600);
 ```
 
-## Testing Strategy
-
-### Test Pyramid
-```
-      /\
-     /E2E\      ← Integration Tests (30%)
-    /------\
-   / Unit  \    ← Unit Tests (70%)
-  /________\
-```
-
-### Test Coverage Goals
-- **Unit Tests**: 80%+ coverage
-- **Integration Tests**: All API endpoints
-- **Feature Tests**: Critical user flows
-- **Performance Tests**: Load testing key endpoints
-
-### Test Types
-
-#### 1. Unit Tests
-```php
-class AchievementServiceTest extends TestCase
-{
-    public function it_unlocks_achievement_when_criteria_met()
-    {
-        // Arrange: Setup test data
-        // Act: Execute service method
-        // Assert: Verify outcome
-    }
-}
-```
-
-#### 2. Integration Tests
-```php
-class UserAchievementApiTest extends TestCase
-{
-    public function user_can_view_achievements()
-    {
-        // Authenticate user
-        // Make API request
-        // Assert response structure and data
-    }
-}
-```
-
 ## Performance Optimization
 
 ### Database Optimization
@@ -394,25 +404,7 @@ Git Push → Tests → Build → Docker Image → Push Registry → Deploy
 - **Contextual Data**: User ID, request ID, timestamps
 - **Log Aggregation**: Centralized log storage
 
-### Metrics Collection
-- Application metrics (Laravel Telescope)
-- Infrastructure metrics (Prometheus)
-- Business metrics (Custom dashboards)
-- Real-time alerts (PagerDuty/Slack)
 
-## Future Enhancements
-
-### Phase 2
-- Real-time WebSocket notifications
-- Advanced analytics dashboard
-- GraphQL API alternative
-- Multi-tenancy support
-
-### Phase 3
-- Machine learning recommendations
-- Predictive analytics
-- A/B testing framework
-- Global CDN distribution
 
 ## Frontend Applications
 
