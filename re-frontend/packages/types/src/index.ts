@@ -270,6 +270,31 @@ export interface AdminStatistics {
   };
 }
 
+export interface AdminUserDetail {
+  user: AdminUserSummary;
+  achievements: {
+    total: number;
+    list: Array<Achievement & { unlocked_at: string }>;
+  };
+  badges: {
+    current: Badge | null;
+    earned: Array<{
+      id: number;
+      name: string;
+      level: number;
+      icon: string;
+      is_current: boolean;
+      earned_at: string;
+    }>;
+  };
+  activity: {
+    total_purchases: number;
+    total_spent: number;
+    recent_purchases: Purchase[];
+    cashback_transactions: CashbackTransaction[];
+  };
+}
+
 /**
  * Notification Types
  */

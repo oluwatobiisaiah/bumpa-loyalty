@@ -30,7 +30,6 @@ export const AchievementsPage: React.FC = () => {
 
     const achievements = dashboard.achievements.progress;
 
-    // Filter achievements
     const filteredAchievements = achievements.filter((achievement) => {
         // Status filter
         if (filter === 'unlocked' && !achievement.progress.unlocked) return false;

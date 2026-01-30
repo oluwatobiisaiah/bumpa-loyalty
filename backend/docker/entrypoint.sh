@@ -5,7 +5,7 @@ echo "Waiting for MySQL to be ready..."
 # Wait for MySQL to accept connections
 until php -r "
 try {
-    new PDO(
+    \$pdo = new PDO(
         'mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_DATABASE'),
         getenv('DB_USERNAME'),
         getenv('DB_PASSWORD')
@@ -69,9 +69,6 @@ fi
 echo "Waiting for RabbitMQ to be ready..."
 RABBIT_HOST="${RABBITMQ_HOST:-rabbitmq}"
 RABBIT_PORT="${RABBITMQ_PORT:-5672}"
-RABBIT_USER="${RABBITMQ_USER:-guest}"
-RABBIT_PASS="${RABBITMQ_PASSWORD:-guest}"
-RABBIT_VHOST="${RABBITMQ_VHOST:-/}"
 
 php -r "
 while (!@fsockopen('$RABBIT_HOST', $RABBIT_PORT)) {
@@ -80,8 +77,6 @@ while (!@fsockopen('$RABBIT_HOST', $RABBIT_PORT)) {
 }
 echo 'RabbitMQ is up!'.PHP_EOL;
 "
-
-# Note: Queue declaration is handled by Laravel's queue configuration
 
 echo "Starting PHP-FPM..."
 exec php-fpm

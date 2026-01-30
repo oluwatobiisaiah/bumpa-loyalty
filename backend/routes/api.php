@@ -71,11 +71,3 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'admin'])->group(function
     Route::get('/loyalty/stats', [AdminAchievementController::class, 'statistics']);
 });
 
-// API documentation route
-Route::get('/docs', function () {
-    return response()->json([
-        'message' => 'Loyalty Program API',
-        'version' => '1.0.0',
-        'documentation' => url('/api/documentation'),
-    ]);
-});

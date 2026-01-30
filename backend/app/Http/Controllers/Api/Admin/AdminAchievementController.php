@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
  */
 class AdminAchievementController extends Controller
 {
-   
+
     /**
      * Get all users' achievements and badge progress
      *
@@ -234,8 +234,8 @@ class AdminAchievementController extends Controller
                     'success_rate' => $this->calculateSuccessRate(),
                 ],
                 'engagement' => [
-                    'avg_achievements_per_user' => DB::table('user_achievements')
-                        ->select(DB::raw('count(*) / count(distinct user_id) as avg'))
+                    'avg_achievements_per_user' => (float) DB::table('user_achievements')
+                        ->select(DB::raw('ROUND(count(*) / count(distinct user_id), 2) as avg'))
                         ->value('avg'),
                     'top_achievers' => User::where('role', User::ROLE_CUSTOMER)
                         ->orderBy('total_points', 'desc')

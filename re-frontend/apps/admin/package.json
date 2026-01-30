@@ -15,6 +15,7 @@
     "@loyalty/ui": "workspace:^",
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.6.5",
+    "lucide-react": "^0.294.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tanstack/react-query-devtools": "^5.91.2",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

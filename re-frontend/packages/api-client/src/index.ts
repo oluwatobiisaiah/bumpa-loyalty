@@ -12,6 +12,7 @@ import type {
   PaginatedResponse,
   AdminUserSummary,
   AdminStatistics,
+  AdminUserDetail,
   UserFilters,
   ApiError,
 } from '@loyalty/types';
@@ -217,13 +218,13 @@ export class apiClient {
     if (filters?.per_page) params.append('per_page', filters.per_page.toString());
 
     const { data } = await this.client.get<PaginatedResponse<AdminUserSummary>>(
-      `/v1/admin/users?${params.toString()}`
+      `/v1/admin/user?${params.toString()}`
     );
     return data;
   }
 
-  async getAdminUserDetails(userId: number): Promise<any> {
-    const { data } = await this.client.get(`/v1/admin/users/${userId}/loyalty`);
+  async getAdminUserDetails(userId: number): Promise<AdminUserDetail> {
+    const { data } = await this.client.get<ApiResponse<AdminUserDetail>>(`/v1/admin/users/${userId}/loyalty`);
     return data.data;
   }
 
@@ -231,6 +232,11 @@ export class apiClient {
     const { data } = await this.client.get<ApiResponse<AdminStatistics>>(
       '/v1/admin/loyalty/stats'
     );
+    return data.data;
+  }
+
+  async getAdminUserAchievements(): Promise<any> {
+    const { data } = await this.client.get('/v1/admin/users/achievements');
     return data.data;
   }
 }
