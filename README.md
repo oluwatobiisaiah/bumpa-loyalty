@@ -1,8 +1,45 @@
-# Loyalty Program - Technical Architecture Documentation
+# Bumpa Loyalty Program
 
-## Executive Summary
+A comprehensive loyalty program application featuring customer-facing dashboards and admin management tools, built with Laravel backend and React frontend.
 
-This document outlines the technical architecture of a production-grade, event-driven loyalty program microservice built with Laravel. The system handles achievements, badges, and cashback rewards with scalability, maintainability, and reliability as core principles.
+## Overview
+
+This application provides a complete loyalty system with:
+- **Customer Portal**: User registration, login, dashboard with achievements, badges, and cashback tracking
+- **Admin Portal**: Management of users, achievements, badges, and system statistics
+- **Backend API**: Event-driven Laravel microservice handling business logic
+- **Infrastructure**: Docker-based deployment with MySQL, Redis, and RabbitMQ
+
+## Architecture
+
+### Backend (Laravel)
+Event-driven microservice handling loyalty program logic with achievements, badges, and cashback processing.
+
+### Frontend (React/TypeScript)
+Turborepo monorepo with two separate applications:
+- **Customer App**: User-facing interface for loyalty program interaction
+- **Admin App**: Administrative interface for system management
+- **Shared UI Package**: Reusable components and utilities
+
+### Infrastructure
+Docker Compose setup with:
+- Laravel application server
+- Nginx reverse proxy
+- MySQL database
+- Redis cache/session store
+- RabbitMQ message queue
+- Queue workers for async processing
+- Frontend served via Nginx
+
+### Technical Decisions
+- **Laravel**: Chosen  as that is what is required for the task
+- **React + TypeScript**: Type-safe frontend development with component reusability
+- **Turborepo**: Efficient monorepo management with build caching and task orchestration
+- **Tailwind CSS**: Utility-first CSS framework for consistent, maintainable styling
+- **Docker**: Containerization for consistent development and deployment environments
+- **RabbitMQ**: Reliable message queuing for async processing
+- **MySQL**: Relational database for structured data with ACID compliance
+- **Redis**: High-performance caching and session storage
 
 ## Architecture Principles
 
@@ -376,6 +413,79 @@ Git Push → Tests → Build → Docker Image → Push Registry → Deploy
 - Predictive analytics
 - A/B testing framework
 - Global CDN distribution
+
+## Frontend Applications
+
+### Customer Portal (`/apps/customer`)
+- User authentication (login/register)
+- Dashboard with loyalty progress
+- Achievement and badge tracking
+- Purchase history and cashback status
+- Profile management
+
+### Admin Portal (`/apps/admin`)
+- Admin authentication
+- User management
+- Achievement and badge administration
+- System statistics and analytics
+- Cashback transaction monitoring
+
+### Shared UI Package (`/packages/ui`)
+- Reusable React components
+- Tailwind CSS configuration
+- Common utilities and hooks
+- Consistent design system
+
+## API Endpoints
+
+### Authentication
+- `POST /api/login` - User/Admin login
+- `POST /api/register` - User registration
+- `POST /api/logout` - Logout
+
+### Customer Endpoints
+- `GET /api/user/achievements` - User's achievements
+- `GET /api/user/badges` - User's badges
+- `GET /api/user/purchases` - Purchase history
+- `GET /api/user/cashback` - Cashback transactions
+
+### Admin Endpoints
+- `GET /api/admin/users` - List users
+- `GET /api/admin/statistics` - System stats
+- `POST /api/admin/achievements` - Create achievement
+- `PUT /api/admin/achievements/{id}` - Update achievement
+- `POST /api/admin/badges` - Create badge
+
+## Development Workflow
+
+### Building and Running
+```bash
+# Build all frontend apps
+cd re-frontend && pnpm build
+
+# Run specific app in development
+pnpm dev --filter=customer
+pnpm dev --filter=admin
+
+# Run backend tests
+cd backend && php artisan test
+```
+
+### Code Quality
+- ESLint for JavaScript/TypeScript linting
+- Prettier for code formatting
+- PHPUnit for backend testing
+- TypeScript for type checking
+
+## Deployment
+
+The application is containerized and can be deployed using Docker Compose. For production:
+
+1. Configure environment variables
+2. Set up SSL certificates
+3. Configure reverse proxy
+4. Set up monitoring and logging
+5. Configure backup strategies
 
 ## Conclusion
 

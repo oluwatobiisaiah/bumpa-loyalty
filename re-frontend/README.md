@@ -16,11 +16,11 @@ This Turborepo includes the following packages/apps:
 
 ### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- `apps/customer`: Customer-facing React application for loyalty program interaction
+- `apps/admin`: Admin dashboard for managing users, achievements, and badges
+- `packages/ui`: Shared React component library with Tailwind CSS
+- `packages/eslint-config`: ESLint configurations
+- `packages/typescript-config`: TypeScript configurations
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
@@ -37,27 +37,24 @@ This Turborepo has some additional tools already setup for you:
 To build all apps and packages, run the following command:
 
 ```
-cd my-turborepo
-
 # With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
 turbo build
 
 # Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
 pnpm exec turbo build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+You can build a specific app by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
 
 ```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+# Build customer app
+turbo build --filter=customer
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+# Build admin app
+turbo build --filter=admin
+
+# Build UI package
+turbo build --filter=ui
 ```
 
 ### Develop
@@ -65,28 +62,39 @@ pnpm exec turbo build --filter=docs
 To develop all apps and packages, run the following command:
 
 ```
-cd my-turborepo
-
 # With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
 turbo dev
 
 # Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
 pnpm exec turbo dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+You can develop a specific app by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
 
 ```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+# Develop customer app
+turbo dev --filter=customer
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+# Develop admin app
+turbo dev --filter=admin
 ```
+
+### Apps Overview
+
+#### Customer App
+- **Port**: 5173 (development)
+- **Features**: User authentication, dashboard, achievements, badges, cashback tracking
+- **Tech**: React, TypeScript, Vite, Tailwind CSS
+
+#### Admin App
+- **Port**: 5174 (development)
+- **Features**: User management, achievement/badge administration, statistics
+- **Tech**: React, TypeScript, Vite, Tailwind CSS
+
+#### UI Package
+- **Components**: Reusable UI components (buttons, tables, forms, etc.)
+- **Styling**: Tailwind CSS with custom design system
+- **Utilities**: Common hooks and utilities
 
 ### Remote Caching
 
