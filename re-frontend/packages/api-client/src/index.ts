@@ -218,7 +218,7 @@ export class apiClient {
     if (filters?.per_page) params.append('per_page', filters.per_page.toString());
 
     const { data } = await this.client.get<PaginatedResponse<AdminUserSummary>>(
-      `/v1/admin/user?${params.toString()}`
+      `/v1/admin/users?${params.toString()}`
     );
     return data;
   }

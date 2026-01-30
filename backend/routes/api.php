@@ -62,6 +62,7 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'admin'])->group(function
     // Admin logout
     Route::post('/logout', [AdminAuthController::class, 'logout']);
     Route::get('/user', [AdminAuthController::class, 'user']);
+    Route::get('/users', [AdminAuthController::class, 'users']);
 
     // Users and achievements
     Route::get('/users/achievements', [AdminAchievementController::class, 'index']);

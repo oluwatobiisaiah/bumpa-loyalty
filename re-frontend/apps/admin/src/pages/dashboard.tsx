@@ -258,7 +258,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {usersData.data.slice(0, 5).map((user) => (
+                {usersData.data?.slice(0, 5).map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
